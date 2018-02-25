@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ListByProviderIdTest {
     public static void main(String[] args) {
+        //jnm,n,mn,mnm,
         BillBiz billBiz=new BillBizImpl();
         Integer[] integers=new Integer[]{1,2,3};
         List<Bill> billList = billBiz.listByProviderId(integers);
