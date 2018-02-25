@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.accp.dao.BillMapper">
+    <resultMap id="BillMap" type="Bill">
+        <result column="id" property="id"/>
+        <result column="productName" property="productName"/>
+        <result column="proName" property="providerName"/>
+    </resultMap>
+    <insert id="insert">
+        INSERT into smbms_bill VALUES
+        (#{id},#{billCode},#{productName},#{productDesc},#{productUnit}
+        ,#{productCount},#{totalPrice},#{isPayment},#{providerId},#{createdBy},now()
+        ,#{modifyBy},#{modifyDate})
+    </insert>
+    <update id="update">
+        UPDATE  smbms_bill
+        <trim prefix="set" suffixOverrides="," suffix="where id=#{id}">
+            <if test="billCode!=null">billCode=#{billCode},</if>
+            <if test="productName!=null">productName=#{productName},</if>
+            <if test="productDesc!=null">productDesc=#{productDesc},</if>
+            <if test="productUnit!=null">productUnit=#{productUnit},</if>
+            <if test="productCount!=null">productCount=#{productCount},</if>
+            <if test="isPayment!=null">isPayment=#{isPayment},</if>
+            <if test="productCount!=null">productCount=#{productCount},</if>
+            <if test="providerId!=null">providerId=#{providerId},</if>
+            <if test="productCount!=null">productCount=#{productCount},</if>
+            <if test="modifyBy!=null">modifyBy=#{modifyBy},</if>
+            modifyDate=now(),
+        </trim>
+    </update>
+    <delete id="delete">
+        DELETE FROM smbms_bill WHERE id=#{id}
+    </delete>
+    <resultMap id="ProviderMap" type="Provider">
+        <id property="id" column="provider_id"></id>
+        <result property="proName" column="proName"/>
+        <result property="proCode" column="proCode"/>
+        <result property="createdBy" column="createdBy"/>
+        <result property="creationDate" column="creationDate"/>
+        <result property="modifyBy" column="modifyBy"/>
+        <result property="modifyDate" column="modifyDate"/>
+    </resultMap>
+    <resultMap id="BillMap2" type="Bill">
+        <result property="id" column="id"/>
+        <result property="billCode" column="billCode"/>
+        <result property="productName" column="productName"/>
+        <result property="productDesc" column="productDesc"/>
+        <result property="productUnit" column="productUnit"/>
+        <result property="productCount" column="productCount"/>
+        <result property="totalPrice" column="totalPrice"/>
+        <result property="isPayment" column="isPayment"/>
+        <result property="providerId" column="providerId"/>
+        <result property="createdBy" column="createdBy"/>
+        <result property="creationDate" column="creationDate"/>
+        <result property="modifyBy" column="modifyBy"/>
+        <result property="modifyDate" column="modifyDate"/>
+        <association resultMap="ProviderMap" property="provider">
+        </association>
+    </resultMap>
+    <select id="listByParam" resultMap="BillMap2">
+        SELECT smbms_bill.*,smbms_provider.id as provider_id,smbms_provider.proName FROM smbms_bill
+        JOIN smbms_provider ON smbms_bill.providerId=smbms_provider.id
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="providerId!=null and providerId!=0">
+                and  smbms_bill.providerId=#{providerId} and smbms_provider.id=#{providerId}
+            </if>
+            <if test="productName!=null and productName!=''">
+                and  smbms_bill.productName LIKE CONCAT('%',#{productName},'%')
+            </if>
+            <if test="isPayment!=null and isPayment!=0">
+                and smbms_bill.isPayment=#{isPayment}
+            </if>
+        </trim>
+    </select>
+
+
+    <select id="selectAll" resultMap="BillMap2">
+          SELECT smbms_bill.*,smbms_provider.id as provider_id,smbms_provider.proName FROM smbms_bill
+        JOIN smbms_provider ON smbms_bill.providerId=smbms_provider.id
+    </select>
+
+    <select id="selectById" resultMap="BillMap2">
+         SELECT smbms_bill.*,smbms_provider.id as provider_id,smbms_provider.proName FROM smbms_bill
+        JOIN smbms_provider ON smbms_bill.providerId=smbms_provider.id
+        where smbms_bill.id=#{id}
+    </select>
+
+    <select id="selectByProviderId" resultMap="BillMap2">
+         SELECT smbms_bill.*,smbms_provider.id as provider_id,smbms_provider.proName FROM smbms_bill
+        JOIN smbms_provider ON smbms_bill.providerId=smbms_provider.id
+        where smbms_bill.providerId in
+            <foreach collection="array" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+    </select>
+
+    <select id="selectByProviderIdAndCode" resultMap="BillMap2">
+        SELECT smbms_bill.*,smbms_provider.id as provider_id,smbms_provider.proName FROM smbms_bill
+        JOIN smbms_provider ON smbms_bill.providerId=smbms_provider.id
+        <where>
+            <if test="list!=null">
+                and smbms_bill.providerId in
+                <foreach collection="list" item="i" open="(" close=")" separator=",">
+                    #{i}
+                </foreach>
+            </if>
+            <if test="billCode!=null and billCode!=''">
+                and billCode like concat('%',#{billCode},'%')
+            </if>
+        </where>
+
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.accp.dao.ProviderMapper">
+    <delete id="delete">
+        delete FROM smbms_provider where id=#{id}
+    </delete>
+    <select id="listAll" resultType="Provider">
+        select * from smbms_provider;
+    </select>
+    <resultMap id="BillMap" type="Bill">
+        <result property="id" column="bid"/>
+        <result property="billCode" column="billCode"/>
+        <result property="productName" column="productName"/>
+        <result property="productDesc" column="productDesc"/>
+        <result property="productUnit" column="productUnit"/>
+        <result property="productCount" column="productCount"/>
+        <result property="totalPrice" column="totalPrice"/>
+        <result property="isPayment" column="isPayment"/>
+        <result property="providerId" column="providerId"/>
+        <result property="createdBy" column="bcb"/>
+        <result property="creationDate" column="bcd"/>
+        <result property="modifyBy" column="bmb"/>
+        <result property="modifyDate" column="bmd"/>
+    </resultMap>
+    <resultMap id="ProviderMap" type="Provider">
+        <result property="id" column="pid"/>
+        <result property="proName" column="proName"/>
+        <result property="proCode" column="proCode"/>
+        <result property="proPhone" column="proPhone"/>
+        <result property="proAddress" column="proAddress"/>
+        <result property="proFax" column="proFax"/>
+        <result property="proContact" column="proContact"/>
+        <result property="proDesc" column="proDesc"/>
+        <result property="createdBy" column="pcb"/>
+        <result property="creationDate" column="pcd"/>
+        <result property="modifyBy" column="pmb"/>
+        <result property="modifyDate" column="pmd"/>
+        <collection property="billList"   resultMap="BillMap"/>
+    </resultMap>
+    <select id="getProviderById" resultMap="ProviderMap">
+        SELECT s_b.id bid,s_p.id pid,s_p.proName,s_p.proCode,s_p.proPhone,s_p.proAddress,s_p.proFax,s_p.proContact,s_p.proDesc
+        ,s_p.createdBy pcb,s_p.creationDate pcd,s_p.modifyBy pmb,s_p.modifyDate pmd
+        ,s_b.createdBy bcb,s_b.creationDate bcd,s_b.modifyBy bmb,s_b.modifyDate bmd
+        ,s_b.billCode,s_b.productName,s_b.productDesc,s_b.productUnit,s_b.productCount,s_b.totalPrice,s_b.isPayment,s_b.providerId
+        FROM smbms_bill s_b,smbms_provider s_p
+        WHERE s_b.providerId=s_p.id AND s_p.id=#{id}
+    </select>
+
+    <select id="listByParam" resultType="Provider">
+        select * from smbms_provider
+        <where>
+            <if test="proCode!=null and proCode!=''">
+               and  proCode like concat('%',#{proCode},'%')
+            </if>
+            <if test="proName!=null and proName!=''">
+                and  proName like concat('%',#{proName},'%')
+            </if>
+        </where>
+    </select>
+    <update id="update">
+        UPDATE smbms_provider
+        <set>
+            <if test="proCode!=null">proCode=#{proCode},</if>
+            <if test="proName!=null">proName=#{proName},</if>
+            <if test="proDesc!=null">proDesc=#{proDesc},</if>
+            <if test="proContact!=null">proContact=#{proContact},</if>
+            <if test="proPhone!=null">proPhone=#{proPhone},</if>
+            <if test="proAddress!=null">proAddress=#{proAddress},</if>
+            <if test="proFax!=null">proFax=#{proFax},</if>
+            <if test="proPhone!=null">proPhone=#{proPhone},</if>
+            <if test="modifyBy!=null">modifyBy=#{modifyBy},</if>
+            modifyDate=now(),
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectByChoose" resultType="Provider">
+        select * from smbms_provider
+        <where>
+            <choose>
+                <when test="proName!=null and proName!='' ">
+                   and proName like concat('%',#{proName},'%')
+                </when>
+                <when test="proCode!=null and proCode!='' ">
+                   and  proCode like concat('%',#{proCode},'%')
+                </when>
+                <when test="proContact!=null and proContact!='' ">
+                  and   proContact like concat('%',#{proContact},'%')
+                </when>
+                <otherwise>
+                    and  YEAR(creationDate)=2016
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.accp.dao.RoleMapper">
+    <insert id="addRole" >
+        insert into smbms_role VALUES (#{id},#{roleCode},#{roleName},#{createdBy},now(),null,NULL)
+    </insert>
+    <update id="modifyRole">
+        update smbms_role set roleCode=#{roleCode},roleName=#{roleName},modifyBy=#{modifyBy},modifyDate=#{modifyDate} WHERE id=#{id}
+    </update>
+    <delete id="removeRole">
+        delete from smbms_role where id=#{id}
+    </delete>
+    <select id="listByName" resultType="Role">
+        SELECT * FROM smbms_role WHERE roleName LIKE CONCAT('%',#{roleName},'%')
+    </select>
+    <select id="listById" resultType="Role">
+        select * from smbms_role where id=#{id}
+    </select>
+</mapper>
